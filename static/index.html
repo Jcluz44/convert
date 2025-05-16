@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Convertisseur M4V → MP4</title>
+</head>
+<body>
+  <h1>Convertisseur M4V → MP4</h1>
+  <form id="upload-form">
+    <input type="file" id="file-input" accept=".m4v" required />
+    <button type="submit">Convertir</button>
+  </form>
+
+  <div id="result" style="margin-top: 20px;"></div>
+
+  <script>
+    const form = document.getElementById("upload-form");
+    const result = document.getElementById("result");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      result.innerHTML = "Conversion en cours...";
+
+      const fileInput = document.getElementById("file-input");
+      const formData = new FormData();
+      formData.append("file", fileInput.files[0]);
+
+      try {
+        const response = await fetch("/convert", {
+          method: "POST",
+          body: formData
+        });
+
+        if (!response.ok) {
+          throw new Error("La conversion a échoué.");
+        }
+
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        result.innerHTML = `<a href="${url}" download="converted.mp4">Télécharger le fichier converti</a>`;
+      } catch (err) {
+        result.innerHTML = "Erreur : " + err.message;
+      }
+    });
+  </script>
+</body>
+</html>
